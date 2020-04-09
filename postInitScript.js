@@ -1,3 +1,3 @@
 #!/usr/bin/env node
 
-console.log("This is post init script");
+console.log("Nothing to do post init right now");
