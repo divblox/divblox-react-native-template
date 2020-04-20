@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
+import {Linking} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {server_base_url as server_url} from './app.json';
 import DeviceInfo from 'react-native-device-info';
+import {Alert} from "react-native";
 class Divblox extends Component {
     constructor() {
         super();
@@ -147,6 +149,37 @@ class Divblox extends Component {
             return return_obj;
         }
         return return_obj;
+    }
+    /**
+     * Used to receive messages from the web app. These messages indicate certain functions to execute natively
+     * @param event
+     */
+    receiveMessageFromWeb(event) {
+        let received_data = this.getJsonObject(event.nativeEvent.data);
+        switch(received_data.function_to_execute) {
+            case 'redirectToExternalPath':
+                Linking.canOpenURL(received_data.redirect_url).then(supported => {
+                    if (supported) {
+                        Alert.alert(
+                            'Open Web Page',
+                            'You are now leaving the app and going to the web.',
+                            [
+                                {text: 'Go', onPress: () => Linking.openURL(received_data.redirect_url)},
+                                {
+                                    text: 'Cancel',
+                                    onPress: () => console.log('Cancel Pressed'),
+                                    style: 'cancel',
+                                },
+                            ],
+                            {cancelable: true},
+                        );
+                    } else {
+                        console.log("Don't know how to open URI: " + received_data.redirect_url);
+                    }
+                });
+                break;
+            default:console.log("Function not implemented");
+        }
     }
 }
 export default Divblox;

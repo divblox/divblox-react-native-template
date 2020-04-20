@@ -238,6 +238,7 @@ function WebScreen({navigation}) {
                     renderLoading={() => {
                         return LoadingIndicator();
                     }}
+                    onMessage={(event)=> dx.receiveMessageFromWeb(event)}
                 />
             </SafeAreaView>
         </>

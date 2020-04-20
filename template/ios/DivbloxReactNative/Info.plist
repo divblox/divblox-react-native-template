@@ -53,5 +53,11 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+    <string>The application needs to be able to upload pictures such as profile pictures, etc</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>The application needs to be able to upload pictures such as profile pictures, etc</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>The application needs to be able to upload pictures or videos such as profile pictures, etc and needs microphone access for videos</string>
 </dict>
 </plist>
