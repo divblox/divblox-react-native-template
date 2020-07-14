@@ -236,7 +236,8 @@ function WebScreen({navigation}) {
     return (
         <>
             <StatusBar barStyle="dark-content"/>
-            <SafeAreaView style={{flex:1}}>
+            <SafeAreaView style={styles.webview}
+                          forceInset={{bottom: 'never'}}>
                 <WebView
                     startInLoadingState={true}
                     source={{ uri: server_final_url }}
