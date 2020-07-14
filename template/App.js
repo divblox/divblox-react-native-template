@@ -5,7 +5,6 @@ import {createStackNavigator} from '@react-navigation/stack';
 import NetInfo from '@react-native-community/netinfo';
 import AsyncStorage from '@react-native-community/async-storage';
 import {
-    SafeAreaView,
     StyleSheet,
     ScrollView,
     View,
@@ -23,6 +22,8 @@ import {WebView} from 'react-native-webview';
 import {server_base_url} from './app.json';
 import RNBootSplash from 'react-native-bootsplash';
 import Divblox from './divblox_react_native';
+import { SafeAreaProvider, useSafeArea } from 'react-native-safe-area-context';
+import SafeAreaView from 'react-native-safe-area-view';
 
 const dx = new Divblox();
 const dimensions = Dimensions.get('window');
@@ -35,6 +36,10 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
+        backgroundColor:'#fff'
+    },
+    webview: {
+        flex: 1,
         backgroundColor:'#fff'
     },
     logo_image: {
@@ -355,7 +360,9 @@ export default class App extends Component {
     
     render() {
         return (
-            <DivbloxWebAppWrapper/>
+            <SafeAreaProvider>
+                <DivbloxWebAppWrapper/>
+            </SafeAreaProvider>
         )
     }
 }
