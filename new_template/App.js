@@ -1,8 +1,8 @@
 import React from 'react';
 
 import DivbloxReactNative from "./divblox/divblox";
-const Divblox = new DivbloxReactNative();
-const NavigationStack = Divblox.getNavigationStack();
+DivbloxReactNative.doInit();
+const NavigationStack = DivbloxReactNative.getNavigationStack();
 
 const App = () => {
     return (

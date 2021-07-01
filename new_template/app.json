@@ -2,5 +2,10 @@
   "name": "DivbloxReactNative",
   "displayName": "Divblox",
   "serverBaseUrl": "https://nativedemo.deploydx.com",
-  "isDivbloxWebApp": true
+  "isDivbloxWebApp": true,
+  "statusBarBackgroundColor": "#edeef1",
+  "statusBarStyle": "dark-content",
+  "bottomBarBackgroundColor": "#edeef1",
+  "fullscreenBackgroundColor": "#000000",
+  "fullscreenTextColor": "#ffffff"
 }
