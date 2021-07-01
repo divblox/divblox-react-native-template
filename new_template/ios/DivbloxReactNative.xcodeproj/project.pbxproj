@@ -13,6 +13,7 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		DFB9C77F268E0937001EB68D /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DFB9C77E268E0936001EB68D /* BootSplash.storyboard */; };
 		EE33288AC5EEC16240130EE1 /* libPods-DivbloxReactNative.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1630A51708B4A5E170A91569 /* libPods-DivbloxReactNative.a */; };
 /* End PBXBuildFile section */
 
@@ -43,6 +44,7 @@
 		7C52B9AB1D181FDCF573F4CD /* libPods-DivbloxReactNative-DivbloxReactNativeTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-DivbloxReactNative-DivbloxReactNativeTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = DivbloxReactNative/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D3DEB0B5F5E0594608B1BAD8 /* Pods-DivbloxReactNative-DivbloxReactNativeTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DivbloxReactNative-DivbloxReactNativeTests.release.xcconfig"; path = "Target Support Files/Pods-DivbloxReactNative-DivbloxReactNativeTests/Pods-DivbloxReactNative-DivbloxReactNativeTests.release.xcconfig"; sourceTree = "<group>"; };
+		DFB9C77E268E0936001EB68D /* BootSplash.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = BootSplash.storyboard; path = DivbloxReactNative/BootSplash.storyboard; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -86,6 +88,7 @@
 		13B07FAE1A68108700A75B9A /* DivbloxReactNative */ = {
 			isa = PBXGroup;
 			children = (
+				DFB9C77E268E0936001EB68D /* BootSplash.storyboard */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -104,7 +107,6 @@
 				19A2A4E273F05D1B15C78CA4 /* Pods-DivbloxReactNative-DivbloxReactNativeTests.debug.xcconfig */,
 				D3DEB0B5F5E0594608B1BAD8 /* Pods-DivbloxReactNative-DivbloxReactNativeTests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -243,6 +245,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DFB9C77F268E0937001EB68D /* BootSplash.storyboard in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);

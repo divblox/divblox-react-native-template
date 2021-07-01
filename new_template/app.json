@@ -3,9 +3,9 @@
   "displayName": "Divblox",
   "serverBaseUrl": "https://nativedemo.deploydx.com",
   "isDivbloxWebApp": true,
-  "statusBarBackgroundColor": "#edeef1",
+  "statusBarBackgroundColor": "#ffffff",
   "statusBarStyle": "dark-content",
-  "bottomBarBackgroundColor": "#edeef1",
+  "bottomBarBackgroundColor": "#ffffff",
   "fullscreenBackgroundColor": "#000000",
   "fullscreenTextColor": "#ffffff"
 }
