@@ -22,6 +22,7 @@ import {
   Linking,
   Alert,
   Dimensions,
+  Image,
 } from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import SafeAreaView from 'react-native-safe-area-view';
@@ -31,6 +32,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import DeviceInfo from 'react-native-device-info';
 
 const dimensions = Dimensions.get('window');
+const imageHeight_3_6x1 = Math.round((dimensions.width * 1) / 3.6);
+const imageWidth_3_6x1 = dimensions.width;
+const imageHeight_1x1 = Math.round(dimensions.width);
+const imageWidth_1x1 = dimensions.width;
 
 const DivbloxReactNative = {
   dxAuthenticationToken: null,
@@ -41,13 +46,13 @@ const DivbloxReactNative = {
   isConnected: false,
   currentNavigationObject: null,
   currentActiveScreen: null,
+  webViewReference: null,
   doInit() {
     if (isDivbloxWebApp) {
       this.initDivbloxWeb();
     } else {
       this.initDivbloxPureNative();
     }
-    this.registerEventHandlers();
   },
   initDivbloxWeb() {
     this.navigationStack = DivbloxWebStack;
@@ -57,21 +62,26 @@ const DivbloxReactNative = {
   },
   registerEventHandlers() {
     NetInfo.addEventListener(state => {
-      if (this.currentNavigationObject !== null) {
-        if (!state.isConnected && this.isConnected) {
-          this.currentNavigationObject.navigate('Offline');
-        } else if (state.isConnected && !this.isConnected) {
-          this.currentNavigationObject.navigate(this.currentActiveScreen);
-        }
-      }
+      const isConnectedLocal =
+        state.isInternetReachable !== false || state.isConnected === true;
 
-      this.isConnected = state.isConnected;
+      (async () => {
+        await this.restoreAuthenticationToken();
+        if (!isConnectedLocal && this.isConnected) {
+          this.currentNavigationObject.navigate('Offline');
+        } else {
+          this.currentNavigationObject.navigate(this.currentActiveScreen);
+          if (this.currentActiveScreen === 'WebWrapper') {
+            this.webViewReference.reload();
+          }
+        }
+        this.isConnected = isConnectedLocal;
+      })();
     });
   },
   setNavigation(navigation, screen) {
     this.currentNavigationObject = navigation;
     this.currentActiveScreen = screen;
-    console.log('Navigation set: ' + this.currentActiveScreen);
   },
   getNavigationStack() {
     return this.navigationStack;
@@ -80,6 +90,10 @@ const DivbloxReactNative = {
     return this.serverFinalUrl;
   },
   loadAppEntryPointScreen() {
+    // Debug code to allow for testing specific screens at load
+    /*this.currentNavigationObject.navigate('Error');
+    return;*/
+
     (async () => {
       await this.restoreAuthenticationToken();
       let isNotFirstLaunch = null;
@@ -92,12 +106,16 @@ const DivbloxReactNative = {
         await DivbloxReactNative.registerDevice();
         this.currentNavigationObject.navigate('Welcome');
       } else {
+        if (this.dxAuthenticationToken === null) {
+          await DivbloxReactNative.registerDevice();
+        }
         if (isDivbloxWebApp) {
           this.currentNavigationObject.navigate('WebWrapper');
         } else {
           this.currentNavigationObject.navigate('Placeholder');
         }
       }
+      this.registerEventHandlers();
     })();
   },
   /**
@@ -212,7 +230,6 @@ const DivbloxReactNative = {
   setFinalServerUrl() {
     this.serverFinalUrl =
       this.serverInitialUrl + '&auth_token=' + this.dxAuthenticationToken;
-    console.log('Final url set: ' + this.serverFinalUrl);
   },
   async registerDevice() {
     try {
@@ -280,7 +297,10 @@ const DivbloxReactNative = {
   },
   async reInitDevice() {
     await AsyncStorage.removeItem('dxAuthenticationToken');
-    await this.registerDevice();
+    this.loadAppEntryPointScreen();
+  },
+  handleError() {
+    this.currentNavigationObject.navigate('Error');
   },
 };
 
@@ -319,6 +339,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: bottomBarBackgroundColor,
   },
+  logo_image: {
+    marginTop: 0,
+    height: imageHeight_3_6x1,
+    width: imageWidth_3_6x1,
+  },
+  icon_image: {
+    marginTop: 0,
+    height: 200,
+    width: 200,
+  },
+  heading: {
+    marginTop: 20,
+  },
+  text: {
+    marginHorizontal: 20,
+    marginVertical: 10,
+    textAlign: 'center',
+  },
 });
 //#endregion
 
@@ -335,7 +373,10 @@ const DivbloxGlobalInitScreen = ({navigation}) => {
     <>
       <SafeAreaView style={styles.fullscreenContainer}>
         <StatusBar barStyle={statusBarStyle} />
-        <LoadingIndicator />
+        <Image
+          style={styles.logo_image}
+          source={require('../../images/divblox_logo_black.jpg')}
+        />
       </SafeAreaView>
     </>
   );
@@ -348,27 +389,63 @@ const DivbloxGlobalWelcomeScreen = ({navigation, route}) => {
     <>
       <SafeAreaView style={styles.fullscreenContainer}>
         <StatusBar barStyle={statusBarStyle} />
-        <Text style={{color: fullscreenTextColor}}>Welcome</Text>
+        <Image
+          style={styles.logo_image}
+          source={require('../../images/divblox_logo_black.jpg')}
+        />
+        <Text style={styles.heading}>WELCOME</Text>
+        <Text style={styles.text}>
+          This is the default welcome screen for a Divblox native app. It will
+          only show once.
+        </Text>
+        <Text style={styles.text}>
+          This is useful for introducing your app to the user and to inform the
+          user that certain requests for permissions might follow (i.e Push
+          notifications)
+        </Text>
         <Button
+          style={styles.button}
           title="Go to app"
           onPress={() => navigation.navigate('WebWrapper')}
-          color={fullscreenTextColor}
         />
       </SafeAreaView>
     </>
   );
 };
 const DivbloxGlobalOfflineScreen = ({navigation, route}) => {
-  return <Text>Offline screen to be built</Text>;
+  return (
+    <>
+      <SafeAreaView style={styles.fullscreenContainer}>
+        <StatusBar barStyle={statusBarStyle} />
+        <Image
+          style={styles.icon_image}
+          source={require('../../images/dx_offline.png')}
+        />
+        <Text style={styles.heading}>YOU'RE OFFLINE</Text>
+        <Text style={styles.text}>
+          Please check your internet connection to proceed
+        </Text>
+      </SafeAreaView>
+    </>
+  );
 };
 const DivbloxGlobalErrorScreen = ({navigation, route}) => {
-  React.useEffect(() => {
-    DivbloxReactNative.setNavigation(navigation, 'Error');
-  }, [navigation]);
   return (
-    <Text>
-      Error screen to be built. Error message: {route.params.errorMessage}
-    </Text>
+    <>
+      <SafeAreaView style={styles.fullscreenContainer}>
+        <StatusBar barStyle={statusBarStyle} />
+        <Image
+          style={styles.icon_image}
+          source={require('../../images/dx_offline.png')}
+        />
+        <Text style={styles.heading}>AN ERROR OCCURRED</Text>
+        <Button
+          title="Reload App"
+          onPress={() => DivbloxReactNative.reInitDevice()}
+          color={fullscreenTextColor}
+        />
+      </SafeAreaView>
+    </>
   );
 };
 const LoadingIndicator = () => {
@@ -400,6 +477,7 @@ const DivbloxWebAppWrapperScreen = ({navigation, route}) => {
       <SafeAreaView style={styles.webContainerBottom}>
         <StatusBar barStyle={statusBarStyle} />
         <WebView
+          ref={ref => (DivbloxReactNative.webViewReference = ref)}
           startInLoadingState={true}
           style={{width: dimensions.width}}
           source={{uri: DivbloxReactNative.getWebWrapperUrl()}}
@@ -412,6 +490,18 @@ const DivbloxWebAppWrapperScreen = ({navigation, route}) => {
             console.warn('WebView error: ', nativeEvent);
           }}
         />
+      </SafeAreaView>
+    </>
+  );
+};
+const DivbloxPreWebWrapperScreen = ({navigation, route}) => {
+  React.useEffect(() => {
+    DivbloxReactNative.setNavigation(navigation, 'PreWebWrapper');
+  }, [navigation]);
+  return (
+    <>
+      <SafeAreaView style={styles.fullscreenContainer}>
+        <StatusBar barStyle={statusBarStyle} />
       </SafeAreaView>
     </>
   );
@@ -445,12 +535,16 @@ const DivbloxWebStack = () => {
             options={{title: 'Init'}}
           />
           <Stack.Screen name="Welcome" component={DivbloxGlobalWelcomeScreen} />
+          <Stack.Screen name="Offline" component={DivbloxGlobalOfflineScreen} />
+          <Stack.Screen name="Error" component={DivbloxGlobalErrorScreen} />
+          <Stack.Screen
+            name="PreWebWrapper"
+            component={DivbloxPreWebWrapperScreen}
+          />
           <Stack.Screen
             name="WebWrapper"
             component={DivbloxWebAppWrapperScreen}
           />
-          <Stack.Screen name="Offline" component={DivbloxGlobalOfflineScreen} />
-          <Stack.Screen name="Error" component={DivbloxGlobalErrorScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

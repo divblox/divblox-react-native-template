@@ -6,6 +6,6 @@
   "statusBarBackgroundColor": "#ffffff",
   "statusBarStyle": "dark-content",
   "bottomBarBackgroundColor": "#ffffff",
-  "fullscreenBackgroundColor": "#000000",
-  "fullscreenTextColor": "#ffffff"
+  "fullscreenBackgroundColor": "#ffffff",
+  "fullscreenTextColor": "#000000"
 }
