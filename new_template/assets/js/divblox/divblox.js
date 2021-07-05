@@ -7,11 +7,10 @@ import {
   bottomBarBackgroundColor,
   fullscreenBackgroundColor,
   fullscreenTextColor,
-} from '../app.json';
+} from '../../../app.json';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {
-  Fragment,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -37,7 +36,8 @@ const DivbloxReactNative = {
   dxAuthenticationToken: null,
   pushRegistrationId: null,
   navigationStack: null,
-  serverFinalUrl: serverBaseUrl + '/?view=native_landing&init_native=1',
+  serverInitialUrl: serverBaseUrl + '/?view=native_landing&init_native=1',
+  serverFinalUrl: this.serverInitialUrl,
   isConnected: false,
   currentNavigationObject: null,
   currentActiveScreen: null,
@@ -80,11 +80,25 @@ const DivbloxReactNative = {
     return this.serverFinalUrl;
   },
   loadAppEntryPointScreen() {
-    if (isDivbloxWebApp) {
-      this.currentNavigationObject.navigate('WebWrapper');
-    } else {
-      this.currentNavigationObject.navigate('Placeholder');
-    }
+    (async () => {
+      await this.restoreAuthenticationToken();
+      let isNotFirstLaunch = null;
+      try {
+        isNotFirstLaunch = await AsyncStorage.getItem('isNotFirstLaunch');
+      } catch (error) {
+        console.log('Error checking for first launch: ' + error);
+      }
+      if (isNotFirstLaunch === null) {
+        await DivbloxReactNative.registerDevice();
+        this.currentNavigationObject.navigate('Welcome');
+      } else {
+        if (isDivbloxWebApp) {
+          this.currentNavigationObject.navigate('WebWrapper');
+        } else {
+          this.currentNavigationObject.navigate('Placeholder');
+        }
+      }
+    })();
   },
   /**
    * Determines whether a string is a valid JSON string
@@ -185,11 +199,24 @@ const DivbloxReactNative = {
       return {dxRequestInternalError: error};
     }
   },
-  async registerDevice() {
+  async restoreAuthenticationToken() {
     try {
       this.dxAuthenticationToken = await AsyncStorage.getItem(
         'dxAuthenticationToken',
       );
+      this.setFinalServerUrl();
+    } catch (error) {
+      console.log('Error restoring authentication token: ' + error);
+    }
+  },
+  setFinalServerUrl() {
+    this.serverFinalUrl =
+      this.serverInitialUrl + '&auth_token=' + this.dxAuthenticationToken;
+    console.log('Final url set: ' + this.serverFinalUrl);
+  },
+  async registerDevice() {
+    try {
+      await this.restoreAuthenticationToken();
       const registerResult = await this.dxRequestInternal(
         serverBaseUrl + '/api/client_authentication_token/registerDevice',
         {
@@ -208,11 +235,7 @@ const DivbloxReactNative = {
             'dxAuthenticationToken',
             registerResult.DeviceLinkedAuthenticationToken,
           );
-          if (this.serverFinalUrl.indexOf('auth_token=') < 1) {
-            this.serverFinalUrl += '&auth_token=' + this.dxAuthenticationToken;
-            console.log('Final url set: ' + this.serverFinalUrl);
-            this.loadAppEntryPointScreen();
-          }
+          await this.restoreAuthenticationToken();
         }
       }
     } catch (error) {
@@ -306,15 +329,7 @@ const Stack = createStackNavigator();
 const DivbloxGlobalInitScreen = ({navigation}) => {
   React.useEffect(() => {
     DivbloxReactNative.setNavigation(navigation, 'Init');
-    (async () => {
-      const isFirstLaunch = await AsyncStorage.getItem('isFirstLaunch');
-      await DivbloxReactNative.registerDevice();
-      if (isFirstLaunch === null) {
-        navigation.navigate('Welcome');
-      } else {
-        DivbloxReactNative.loadAppEntryPointScreen();
-      }
-    })();
+    DivbloxReactNative.loadAppEntryPointScreen();
   }, [navigation]);
   return (
     <>
@@ -336,7 +351,7 @@ const DivbloxGlobalWelcomeScreen = ({navigation, route}) => {
         <Text style={{color: fullscreenTextColor}}>Welcome</Text>
         <Button
           title="Go to app"
-          onPress={() => DivbloxReactNative.loadAppEntryPointScreen()}
+          onPress={() => navigation.navigate('WebWrapper')}
           color={fullscreenTextColor}
         />
       </SafeAreaView>
@@ -376,7 +391,7 @@ const DivbloxWebAppWrapperScreen = ({navigation, route}) => {
       console.log('Here we must send the back signal to the web app');
     });
     (async () => {
-      await AsyncStorage.setItem('isFirstLaunch', '1');
+      await AsyncStorage.setItem('isNotFirstLaunch', '1');
     })();
   }, [navigation]);
   return (

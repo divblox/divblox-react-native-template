@@ -1,7 +1,7 @@
 import React from 'react';
 import RNBootSplash from "react-native-bootsplash";
 
-import DivbloxReactNative from "./divblox/divblox";
+import DivbloxReactNative from "./assets/js/divblox/divblox";
 DivbloxReactNative.doInit();
 const NavigationStack = DivbloxReactNative.getNavigationStack();
 
